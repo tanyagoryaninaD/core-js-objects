@@ -413,7 +413,6 @@ const cssSelectorBuilder = {
   separators: [],
 
   element(value) {
-    console.log('🚀 ~ element ~ value:', value, this);
     if (this.builder.length !== 0) {
       this.builderCombine.push(this.builder);
       this.builder = [];
@@ -424,8 +423,7 @@ const cssSelectorBuilder = {
   },
 
   id(value) {
-    console.log('🚀 ~ element ~ value:', value, this);
-    if (this.builder.join('').includes('#') || this.builder.length > 2) {
+    if (this.builder.join('').includes('#')) {
       this.builderCombine.push(this.builder);
       this.builder = [];
     }
@@ -435,25 +433,21 @@ const cssSelectorBuilder = {
   },
 
   class(value) {
-    console.log('🚀 ~ element ~ value:', value, this);
     this.builder.push(`.${value}`);
     return this;
   },
 
   attr(value) {
-    console.log('🚀 ~ element ~ value:', value, this);
     this.builder.push(`[${value}]`);
     return this;
   },
 
   pseudoClass(value) {
-    console.log('🚀 ~ element ~ value:', value, this);
     this.builder.push(`:${value}`);
     return this;
   },
 
   pseudoElement(value) {
-    console.log('🚀 ~ element ~ value:', value, this);
     this.builder.push(`::${value}`);
     return this;
   },
@@ -462,26 +456,22 @@ const cssSelectorBuilder = {
     if (selector1 && combinator && selector2) {
       this.separators.push(` ${combinator} `);
     }
-    console.log('🚀 ~ combine ~ this.builderCombine:', this);
     return this;
   },
 
   stringify() {
     let result;
-    console.log('🚀 ~ stringify ~ this.builderCombine:', this.builderCombine);
     if (this.builderCombine.length > 0) {
       this.builderCombine.push(this.builder);
       let count = this.separators.length - 1;
-      const map = this.builderCombine.map((acc, selector) => {
-        acc.push(this.builderCombine[selector].join(''));
-
+      const map = this.builderCombine.map((acc) => {
         if (this.separators[count]) {
           acc.push(this.separators[count]);
           count -= 1;
         }
 
         return acc;
-      }, []);
+      });
 
       result = map.flat().join('');
     } else {
@@ -490,32 +480,11 @@ const cssSelectorBuilder = {
 
     this.builder = [];
     this.builderCombine = [];
+    this.separators = [];
 
-    console.log('🚀 ~ stringify ~ result:', result);
     return result;
   },
 };
-const builder = cssSelectorBuilder;
-console.log('123', builder.element('div').stringify());
-console.log(
-  'combine',
-  builder
-    .combine(
-      builder.element('div').id('main').class('container').class('draggable'),
-      '+',
-      builder.combine(
-        builder.element('table').id('data'),
-        '~',
-        builder.combine(
-          builder.element('tr').pseudoClass('nth-of-type(even)'),
-          ' ',
-          builder.element('td').pseudoClass('nth-of-type(even)')
-        )
-      )
-    )
-    .stringify()
-);
-// console.log(builder.element('div').stringify());
 
 module.exports = {
   shallowCopy,
